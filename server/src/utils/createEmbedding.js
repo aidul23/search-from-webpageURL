@@ -7,15 +7,38 @@ const openai = new OpenAI({
 });
 
 const createEmbedding = async (text) => {
-  const embeddingResponse = await openai.embeddings.create({
-    model: "text-embedding-ada-002",
-    input: text,
-  });
-  const [{ embedding }] = embeddingResponse?.data?.data;
+  try {
+    if (!text || typeof text !== "string") {
+      throw new Error("Invalid input text for embedding");
+    }
 
-  console.log("embedding", embedding);
+    const embeddingResponse = await openai.embeddings.create({
+      model: "text-embedding-ada-002",
+      input: text,
+    });
 
-  return embedding;
+    // Debug log the structure of embeddingResponse
+    console.log("Received embeddingResponse:", JSON.stringify(embeddingResponse, null, 2));
+
+    if (
+      !embeddingResponse ||
+      !embeddingResponse.data ||
+      !Array.isArray(embeddingResponse.data) ||
+      !embeddingResponse.data[0] ||
+      !embeddingResponse.data[0].embedding
+    ) {
+      throw new Error("Unexpected API response structure");
+    }
+
+    const embedding = embeddingResponse.data[0].embedding;
+    console.log("Extracted embedding:", embedding);
+
+    return embedding;
+  } catch (error) {
+    console.error("Error creating embedding:", error.message || error);
+    throw error;
+  }
 };
+
 
 module.exports = { createEmbedding };
