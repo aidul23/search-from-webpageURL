@@ -82,7 +82,7 @@ const queryDocument = async (req, res) => {
 
     const answer = await hitOpenAiApi(prompt);
     console.log("answer: ", answer);
-    res.send(answer);
+    res.json({answer});
   } catch (err) {
     res.status(500).json({
       error: "Internal server error",
