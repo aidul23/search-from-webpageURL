@@ -32,6 +32,7 @@
 // module.exports = { hitOpenAiApi }
 
 const OpenAI = require("openai");
+const fs = require("fs");
 
 require("dotenv").config();
 
@@ -69,4 +70,49 @@ async function hitOpenAiApi(prompt) {
   }
 }
 
-module.exports = { hitOpenAiApi };
+// async function transcribeAudio(filePath) {
+//   try {
+//     const transcriptionResponse = await openai.audio.transcription.create({
+//       file: fs.createReadStream(filePath),
+//       model: "whisper-1",
+//     });
+
+//     const transcription = transcriptionResponse.text;
+//     console.log("Transcription:", transcription);
+
+//     return transcription;
+//   } catch (error) {
+//     console.error("Error during audio transcription:", error.message);
+//     throw new Error("Failed to transcribe audio");
+//   }
+// }
+
+async function transcribeAudio(filePath) {
+  try {
+    console.log("Attempting to transcribe file:", filePath);
+    
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`File not found: ${filePath}`);
+    }
+
+    const transcriptionResponse = await openai.audio.transcriptions.create({
+      file: fs.createReadStream(filePath),
+      model: "whisper-1",
+      response_format: "json",
+      language: "en"  // Specify the language if known, or remove this line for auto-detection
+    });
+
+    console.log("OpenAI API Response:", transcriptionResponse);
+
+    const transcription = transcriptionResponse.text;
+    
+    console.log("Transcription:", transcription);
+
+    return transcription;
+  } catch (error) {
+    console.error("Error during audio transcription:", error);
+    throw new Error(`Failed to transcribe audio: ${error.message}`);
+  }
+}
+
+module.exports = { hitOpenAiApi, transcribeAudio };

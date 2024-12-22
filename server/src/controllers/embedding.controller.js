@@ -1,7 +1,36 @@
 const UploadDocument = require("../models/documentUpload.model");
 const { runWebScraper } = require("../utils/runWebScraper");
 const { createEmbedding } = require("../utils/createEmbedding");
-const { hitOpenAiApi } = require("../utils/hitOpenAiApi");
+const { hitOpenAiApi, transcribeAudio } = require("../utils/hitOpenAiApi");
+
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "uploads/"); // Save to 'uploads' folder
+//   },
+//   filename: (req, file, cb) => {
+//     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+//     const extension = ".m4a"; // Set the desired extension
+//     cb(null, `${uniqueSuffix}${extension}`);
+//   },
+// });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const extension = path.extname(file.originalname);
+    cb(null, `${uniqueSuffix}${extension}`);
+  },
+});
+
+
+const upload = multer({ storage });
 
 const addDocument = async (req, res) => {
   try {
@@ -82,7 +111,7 @@ const queryDocument = async (req, res) => {
 
     const answer = await hitOpenAiApi(prompt);
     console.log("answer: ", answer);
-    res.json({answer});
+    res.json({ answer });
   } catch (err) {
     res.status(500).json({
       error: "Internal server error",
@@ -91,4 +120,30 @@ const queryDocument = async (req, res) => {
   }
 };
 
-module.exports = { addDocument, queryDocument };
+const addAudioQuery = async (req, res) => {
+  try {
+    const audioFile = req.file; // Multer attaches the file to `req.file`
+    if (!audioFile) {
+      return res.status(400).json({ error: "No audio file provided" });
+    }
+
+    console.log(audioFile);
+    
+    console.log(audioFile.path);
+    
+
+    // Transcribe the audio file
+    const transcription = await transcribeAudio(audioFile.path);
+
+    // Clean up uploaded file
+    fs.unlinkSync(audioFile.path);
+
+    // Respond with the transcription
+    res.json({ transcription, response: "AI response placeholder" });
+  } catch (error) {
+    console.error("Error processing audio query:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports = { addDocument, queryDocument, addAudioQuery, upload };
