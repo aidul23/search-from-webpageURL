@@ -211,7 +211,7 @@ const ChatArea = () => {
           disabled={loading}
         >
           {isRecording ? <FaStop /> : <FaMicrophone />}
-          <span>{isRecording ? "Stop Recording" : "Record Audio"}</span>
+          <span>{isRecording ? "Stop" : "Ask"}</span>
         </button>
       </div>
     </div>

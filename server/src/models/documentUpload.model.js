@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const documentUploadSchema = new mongoose.Schema({
-  title: String,
+  url: String,
   description: String,
   fileName: String,
   uploadDate: {

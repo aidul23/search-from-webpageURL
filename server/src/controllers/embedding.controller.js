@@ -7,17 +7,6 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, "uploads/"); // Save to 'uploads' folder
-//   },
-//   filename: (req, file, cb) => {
-//     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-//     const extension = ".m4a"; // Set the desired extension
-//     cb(null, `${uniqueSuffix}${extension}`);
-//   },
-// });
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "uploads/");
@@ -34,7 +23,7 @@ const upload = multer({ storage });
 
 const addDocument = async (req, res) => {
   try {
-    const { url } = req.body;
+    const { url, docName } = req.body;
 
     // there is a limit to text length, need to split text
     const { text } = await runWebScraper(url);
@@ -42,6 +31,8 @@ const addDocument = async (req, res) => {
     const embedding = await createEmbedding(text);
 
     const newDoc = new UploadDocument({
+      url: url,
+      fileName: docName,
       description: text,
       embedding: embedding,
     });
@@ -58,6 +49,16 @@ const addDocument = async (req, res) => {
       error: "Internal server error",
       message: err.message,
     });
+  }
+};
+
+const getDocuments = async (req, res) => {
+  try {
+    const documents = await UploadDocument.find({}, "url fileName"); // Fetch only `url` and `docName` fields
+    res.json({ documents });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch documents" });
   }
 };
 
@@ -146,4 +147,4 @@ const addAudioQuery = async (req, res) => {
   }
 };
 
-module.exports = { addDocument, queryDocument, addAudioQuery, upload };
+module.exports = { addDocument, queryDocument, addAudioQuery, upload, getDocuments };
