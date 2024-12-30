@@ -3,7 +3,7 @@ This is a full-stack web application that allows users to store text content fro
 
 ### Features
 - URL Embedding: Extracts and embeds webpage content into a MongoDB vector database.
-- Query System: Allows users to ask questions, and the app responds with answers based on the embedded content.
+- Query System: Allows users to ask questions in text and audio, and the app responds with answers based on the embedded content.
 - Responsive Design: Frontend styled using Tailwind CSS and designed to mimic ChatGPT’s interface.
 - Interactive Sidebar: Sidebar for adding URLs and a chat-like area for user interaction.
 - Real-Time Feedback: Provides loading indicators and success/error messages during operations.
@@ -18,9 +18,10 @@ This is a full-stack web application that allows users to store text content fro
 - MongoDB with Atlas Search for storing and querying vectorized data.
 - OpenAI API's *text-embedding-ada-002* model is used for text embedding to vectorize data.
 - OpenAI API's *gpt-3.5-turbo-16k* model is used for context-based query from vector database
+- OpenAI API's *whisper* model is used for speech to text convertion
 
 #### Preview
-![image](https://github.com/user-attachments/assets/882fc172-4d48-4f40-8815-c33ec04cf482)
+![Screenshot 2024-12-30 032827](https://github.com/user-attachments/assets/ecf42630-41d2-4309-b3de-427990d39eed)
 Video:
 https://github.com/user-attachments/assets/7f0d4dcf-d72a-4689-9ea5-42b690e5243a
 
